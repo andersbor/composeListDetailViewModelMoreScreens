@@ -23,6 +23,22 @@ class BooksViewModel : ViewModel() {
         return books.find { it.id == id }
     }
 
+    fun sortBooksByTitle(ascending: Boolean) {
+        if (ascending) {
+            books.sortBy { it.title }
+        } else {
+            books.sortByDescending { it.title }
+        }
+    }
+
+    fun sortBooksByPrice(ascending: Boolean) {
+        if (ascending) {
+            books.sortBy { it.price }
+        } else {
+            books.sortByDescending { it.price }
+        }
+    }
+
     val addBook: (Book) -> Unit = {
         books.add(it)
     }

@@ -40,7 +40,9 @@ fun MainScreen() {
                 viewModel.books,
                 removeBook = { book -> viewModel.removeBook(book) },
                 navigateToDetail = { bookId -> navController.navigate(NavRoutes.Detail.route + "/$bookId") },
-                navigateToAdd = { navController.navigate(NavRoutes.Add.route) }
+                navigateToAdd = { navController.navigate(NavRoutes.Add.route) },
+                sortByTitle = { viewModel.sortBooksByTitle(it) },
+                sortByPrice = { viewModel.sortBooksByPrice(it) }
             )
         }
         composable(

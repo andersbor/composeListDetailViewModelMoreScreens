@@ -1,5 +1,6 @@
 package com.example.listdetailviewmodelmorescreens.screens
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,11 +16,17 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +40,9 @@ fun ListScreen(
     books: List<Book>,
     removeBook: (Book) -> Unit = {},
     navigateToDetail: (Int) -> Unit = {},
-    navigateToAdd: () -> Unit = {}
+    navigateToAdd: () -> Unit = {},
+    sortByTitle: (Boolean) -> Unit = {},
+    sortByPrice: (Boolean) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -54,9 +63,10 @@ fun ListScreen(
             books = books,
             modifier = Modifier.padding(innerPadding),
             onClickItem = { navigateToDetail(it.id) },
-            onClickDelete = { removeBook(it) }
+            onClickDelete = { removeBook(it) },
+            sortByTitle = { asc -> sortByTitle(asc) },
+            sortByPrice = { asc -> sortByPrice(asc) }
         )
-
     }
 }
 
@@ -65,11 +75,36 @@ fun BookListPanel(
     books: List<Book>,
     modifier: Modifier = Modifier,
     onClickItem: (Book) -> Unit = {},
-    onClickDelete: (Book) -> Unit = {}
+    onClickDelete: (Book) -> Unit = {},
+    sortByTitle: (up: Boolean) -> Unit = {},
+    sortByPrice: (up: Boolean) -> Unit = {}
 ) {
-    LazyColumn(modifier = modifier) {
-        items(books) { book ->
-            BookItem(book, onClickItem = onClickItem, onClickDelete = onClickDelete)
+    Column(modifier = modifier) {
+        val titleUp = "Title \u2191"
+        val titleDown = "Title \u2193"
+        val priceUp = "Price \u2191"
+        val priceDown = "Price \u2193"
+        var sortTitleAscending by remember { mutableStateOf(true) }
+        var sortPriceAscending by remember { mutableStateOf(true) }
+
+        Row {
+            OutlinedButton(onClick = {
+                sortByTitle(sortTitleAscending)
+                sortTitleAscending = !sortTitleAscending
+            }) {
+                Text(text = if (sortTitleAscending) titleDown else titleUp)
+            }
+            TextButton(onClick = {
+                sortByPrice(sortPriceAscending)
+                sortPriceAscending = !sortPriceAscending
+            }) {
+                Text(text = if (sortPriceAscending) priceDown else priceUp)
+            }
+        }
+        LazyColumn {
+            items(books) { book ->
+                BookItem(book, onClickItem = onClickItem, onClickDelete = onClickDelete)
+            }
         }
     }
 }
@@ -86,11 +121,11 @@ fun BookItem(
         onClick = { onClickItem(book) }) {
         Row(modifier = Modifier.padding(2.dp)) {
             Text(
-                text = book.author,
+                text = book.title,
                 modifier = Modifier.padding(8.dp),
                 fontWeight = FontWeight.Bold
             )
-            Text(text = book.title, modifier = Modifier.padding(8.dp), fontStyle = FontStyle.Italic)
+            Text(text = book.price.toString(), modifier = Modifier.padding(8.dp), fontStyle = FontStyle.Italic)
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { onClickDelete(book) }) {
                 Icon(Icons.Outlined.Delete, contentDescription = "Delete")
